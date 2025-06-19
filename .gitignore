@@ -1,0 +1,20 @@
+# 忽略 VS 生成的文件和文件夹
+Debug/
+Release/
+x64/
+*.obj
+*.pdb
+*.idb
+*.ilk
+*.log
+*.tlog/
+*.res
+*.aps
+*.exe
+*.user
+*.ipch
+*.suo
+*.VC.db
+*.wav
+*.mp3
+.vs/
