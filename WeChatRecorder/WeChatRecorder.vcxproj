@@ -76,6 +76,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -90,6 +91,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -102,12 +104,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>F:\C++\自动录音\自动录音_根据麦克风\WeChatRecorder\WeChatRecorder\WeChatRecorder\libs\ffmpeg\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);Comctl32.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);Comctl32.lib;avcodec.lib;avformat.lib;avutil.lib;avdevice.lib;avfilter.lib;swresample.lib;swscale.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>F:\C++\自动录音\自动录音_根据麦克风\WeChatRecorder\WeChatRecorder\WeChatRecorder\libs\ffmpeg\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -118,6 +122,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -126,15 +131,20 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="about_page.h" />
-    <ClInclude Include="custom_button.h" />
+    <ClInclude Include="blacklist_page.h" />
+    <ClInclude Include="config_manager.h" />
     <ClInclude Include="device_enum.h" />
     <ClInclude Include="device_page.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="general_page.h" />
+    <ClInclude Include="libs\lame\lame.h" />
+    <ClInclude Include="log.h" />
     <ClInclude Include="mic_level_sampler.h" />
     <ClInclude Include="path_page.h" />
     <ClInclude Include="path_util.h" />
-    <ClInclude Include="recorder.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="startup_util.h" />
+    <ClInclude Include="string_util.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="wasapi_recorder.h" />
     <ClInclude Include="WeChatRecorder.h" />
@@ -142,22 +152,28 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="about_page.cpp" />
-    <ClCompile Include="custom_button.cpp" />
+    <ClCompile Include="blacklist_page.cpp" />
+    <ClCompile Include="config_manager.cpp" />
     <ClCompile Include="device_enum.cpp" />
     <ClCompile Include="device_page.cpp" />
+    <ClCompile Include="general_page.cpp" />
+    <ClCompile Include="log.cpp" />
     <ClCompile Include="mic_level_sampler.cpp" />
     <ClCompile Include="path_page.cpp" />
     <ClCompile Include="path_util.cpp" />
+    <ClCompile Include="startup_util.cpp" />
+    <ClCompile Include="string_util.cpp" />
     <ClCompile Include="wasapi_recorder.cpp" />
     <ClCompile Include="WeChatRecorder.cpp" />
     <ClCompile Include="wechat_detector.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="Resource.rc" />
     <ResourceCompile Include="WeChatRecorder.rc" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="small.ico" />
+    <Image Include="wecall_recorder.ico" />
+    <Image Include="wecall_recorder_small.ico" />
     <Image Include="WeChatRecorder.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

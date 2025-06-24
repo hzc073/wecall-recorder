@@ -1,159 +1,82 @@
+// 文件名：device_enum.cpp
 #include "device_enum.h"
+#include <windows.h>
 #include <mmdeviceapi.h>
-#include <functiondiscoverykeys_devpkey.h>
+#include <Functiondiscoverykeys_devpkey.h>
+#include "log.h"
 
-//输入
-std::vector<DeviceInfo> EnumInputDevices() {
-    std::vector<DeviceInfo> result;
+// 内部辅助函数，返回 FFmpegDeviceInfo 类型
+static std::vector<FFmpegDeviceInfo> EnumDevicesInternal(EDataFlow dataFlow) {
+    std::vector<FFmpegDeviceInfo> devices;
     HRESULT hr = CoInitializeEx(NULL, COINIT_MULTITHREADED);
+    if (FAILED(hr)) {
+        WriteLog(L"[EnumDevice] CoInitializeEx 失败, hr=0x%08X", hr);
+        return devices;
+    }
 
-    IMMDeviceEnumerator* pEnum = nullptr;
-    IMMDeviceCollection* pDevices = nullptr;
-    hr = CoCreateInstance(__uuidof(MMDeviceEnumerator), NULL, CLSCTX_ALL, IID_PPV_ARGS(&pEnum));
-    if (FAILED(hr)) return result;
+    IMMDeviceEnumerator* pEnumerator = nullptr;
+    hr = CoCreateInstance(__uuidof(MMDeviceEnumerator), NULL, CLSCTX_ALL, IID_PPV_ARGS(&pEnumerator));
+    if (FAILED(hr)) {
+        WriteLog(L"[EnumDevice] CoCreateInstance 失败, hr=0x%08X", hr);
+        CoUninitialize();
+        return devices;
+    }
 
-    hr = pEnum->EnumAudioEndpoints(eCapture, DEVICE_STATE_ACTIVE, &pDevices);
-    if (SUCCEEDED(hr)) {
-        UINT count = 0;
-        pDevices->GetCount(&count);
-        for (UINT i = 0; i < count; ++i) {
-            IMMDevice* pDevice = nullptr;
-            if (SUCCEEDED(pDevices->Item(i, &pDevice))) {
-                LPWSTR id = nullptr;
-                pDevice->GetId(&id);
+    IMMDeviceCollection* pCollection = nullptr;
+    hr = pEnumerator->EnumAudioEndpoints(dataFlow, DEVICE_STATE_ACTIVE, &pCollection);
+    if (FAILED(hr)) {
+        WriteLog(L"[EnumDevice] EnumAudioEndpoints 失败, hr=0x%08X", hr);
+        pEnumerator->Release();
+        CoUninitialize();
+        return devices;
+    }
 
+    UINT count;
+    pCollection->GetCount(&count);
+    WriteLog(L"[EnumDevice] 找到 %u 个 %s 设备", count, (dataFlow == eCapture) ? L"输入" : L"输出");
+
+    for (UINT i = 0; i < count; i++) {
+        IMMDevice* pDevice = nullptr;
+        hr = pCollection->Item(i, &pDevice);
+        if (SUCCEEDED(hr)) {
+            LPWSTR pwszID = nullptr;
+            hr = pDevice->GetId(&pwszID);
+            if (SUCCEEDED(hr)) {
                 IPropertyStore* pProps = nullptr;
-                std::wstring name;
-                if (SUCCEEDED(pDevice->OpenPropertyStore(STGM_READ, &pProps))) {
+                hr = pDevice->OpenPropertyStore(STGM_READ, &pProps);
+                if (SUCCEEDED(hr)) {
                     PROPVARIANT varName;
                     PropVariantInit(&varName);
-                    if (SUCCEEDED(pProps->GetValue(PKEY_Device_FriendlyName, &varName))) {
-                        name = varName.pwszVal;
-                        PropVariantClear(&varName);
+                    hr = pProps->GetValue(PKEY_Device_FriendlyName, &varName);
+                    if (SUCCEEDED(hr)) {
+                        // --- 核心修复点：创建 FFmpegDeviceInfo 对象 ---
+                        FFmpegDeviceInfo info;
+                        info.id = pwszID;
+                        info.name = varName.pwszVal;
+                        devices.push_back(info);
+                        WriteLog(L"  - 设备 %d: %s (ID: %s)", i, info.name.c_str(), info.id.c_str());
                     }
+                    PropVariantClear(&varName);
                     pProps->Release();
                 }
-                result.push_back({ id, name });
-                CoTaskMemFree(id);
-                pDevice->Release();
+                CoTaskMemFree(pwszID);
             }
+            pDevice->Release();
         }
-        pDevices->Release();
     }
-    if (pEnum) pEnum->Release();
-    CoUninitialize();
-    return result;
-}
 
-//输出
-std::vector<DeviceInfo> EnumOutputDevices() {
-    std::vector<DeviceInfo> result;
-    HRESULT hr = CoInitializeEx(NULL, COINIT_MULTITHREADED);
-    IMMDeviceEnumerator* pEnum = nullptr;
-    IMMDeviceCollection* pDevices = nullptr;
-    hr = CoCreateInstance(__uuidof(MMDeviceEnumerator), NULL, CLSCTX_ALL, IID_PPV_ARGS(&pEnum));
-    if (FAILED(hr)) return result;
-    hr = pEnum->EnumAudioEndpoints(eRender, DEVICE_STATE_ACTIVE, &pDevices);
-    if (SUCCEEDED(hr)) {
-        UINT count = 0;
-        pDevices->GetCount(&count);
-        for (UINT i = 0; i < count; ++i) {
-            IMMDevice* pDevice = nullptr;
-            if (SUCCEEDED(pDevices->Item(i, &pDevice))) {
-                LPWSTR id = nullptr;
-                pDevice->GetId(&id);
-                IPropertyStore* pProps = nullptr;
-                std::wstring name;
-                if (SUCCEEDED(pDevice->OpenPropertyStore(STGM_READ, &pProps))) {
-                    PROPVARIANT varName;
-                    PropVariantInit(&varName);
-                    if (SUCCEEDED(pProps->GetValue(PKEY_Device_FriendlyName, &varName))) {
-                        name = varName.pwszVal;
-                        PropVariantClear(&varName);
-                    }
-                    pProps->Release();
-                }
-                result.push_back({ id, name });
-                CoTaskMemFree(id);
-                pDevice->Release();
-            }
-        }
-        pDevices->Release();
-    }
-    if (pEnum) pEnum->Release();
-    CoUninitialize();
-    return result;
-}
-
-
-//
-// device_enum.cpp
-#include <endpointvolume.h> // 需要加头文件
-
-// 获取默认输入设备（麦克风）音量（峰值）
-float GetMicPeakLevel() {
-    HRESULT hr;
-    float peak = 0.0f;
-
-    hr = CoInitializeEx(NULL, COINIT_MULTITHREADED);
-    IMMDeviceEnumerator* pEnum = nullptr;
-    IMMDevice* pDevice = nullptr;
-    IAudioMeterInformation* pMeter = nullptr;
-
-    do {
-        hr = CoCreateInstance(__uuidof(MMDeviceEnumerator), NULL, CLSCTX_ALL, IID_PPV_ARGS(&pEnum));
-        if (FAILED(hr)) break;
-
-        hr = pEnum->GetDefaultAudioEndpoint(eCapture, eConsole, &pDevice);
-        if (FAILED(hr)) break;
-
-        hr = pDevice->Activate(__uuidof(IAudioMeterInformation), CLSCTX_ALL, NULL, (void**)&pMeter);
-        if (FAILED(hr)) break;
-
-        hr = pMeter->GetPeakValue(&peak);
-        if (FAILED(hr)) peak = 0.0f;
-    } while (false);
-
-    if (pMeter) pMeter->Release();
-    if (pDevice) pDevice->Release();
-    if (pEnum) pEnum->Release();
+    pCollection->Release();
+    pEnumerator->Release();
     CoUninitialize();
 
-    // 返回值 0.0~1.0
-    return peak;
+    return devices;
 }
 
-// 获取默认输出设备（扬声器）音量（峰值）
-float GetSpeakerPeakLevel() {
-    HRESULT hr;
-    float peak = 0.0f;
-
-    hr = CoInitializeEx(NULL, COINIT_MULTITHREADED);
-    IMMDeviceEnumerator* pEnum = nullptr;
-    IMMDevice* pDevice = nullptr;
-    IAudioMeterInformation* pMeter = nullptr;
-
-    do {
-        hr = CoCreateInstance(__uuidof(MMDeviceEnumerator), NULL, CLSCTX_ALL, IID_PPV_ARGS(&pEnum));
-        if (FAILED(hr)) break;
-
-        hr = pEnum->GetDefaultAudioEndpoint(eRender, eConsole, &pDevice);
-        if (FAILED(hr)) break;
-
-        hr = pDevice->Activate(__uuidof(IAudioMeterInformation), CLSCTX_ALL, NULL, (void**)&pMeter);
-        if (FAILED(hr)) break;
-
-        hr = pMeter->GetPeakValue(&peak);
-        if (FAILED(hr)) peak = 0.0f;
-    } while (false);
-
-    if (pMeter) pMeter->Release();
-    if (pDevice) pDevice->Release();
-    if (pEnum) pEnum->Release();
-    CoUninitialize();
-
-    // 返回值 0.0~1.0
-    return peak;
+// 实现返回 FFmpegDeviceInfo 类型的函数
+std::vector<FFmpegDeviceInfo> EnumInputDevices() {
+    return EnumDevicesInternal(eCapture);
 }
 
-
+std::vector<FFmpegDeviceInfo> EnumOutputDevices() {
+    return EnumDevicesInternal(eRender);
+}

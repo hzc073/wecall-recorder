@@ -27,13 +27,7 @@
     <ClInclude Include="WeChatRecorder.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="wasapi_recorder.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="wechat_detector.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="recorder.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="device_page.h">
@@ -45,9 +39,6 @@
     <ClInclude Include="about_page.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="custom_button.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="path_util.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -57,12 +48,33 @@
     <ClInclude Include="mic_level_sampler.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="log.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\lame\lame.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="string_util.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="wasapi_recorder.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="general_page.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="startup_util.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="blacklist_page.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="config_manager.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WeChatRecorder.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="wasapi_recorder.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="wechat_detector.cpp">
@@ -77,9 +89,6 @@
     <ClCompile Include="about_page.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="custom_button.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="path_util.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -89,12 +98,30 @@
     <ClCompile Include="mic_level_sampler.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="log.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="string_util.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="wasapi_recorder.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="general_page.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="startup_util.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="blacklist_page.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="config_manager.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="WeChatRecorder.rc">
-      <Filter>资源文件</Filter>
-    </ResourceCompile>
-    <ResourceCompile Include="Resource.rc">
       <Filter>资源文件</Filter>
     </ResourceCompile>
   </ItemGroup>
@@ -103,6 +130,12 @@
       <Filter>资源文件</Filter>
     </Image>
     <Image Include="WeChatRecorder.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="wecall_recorder.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="wecall_recorder_small.ico">
       <Filter>资源文件</Filter>
     </Image>
   </ItemGroup>

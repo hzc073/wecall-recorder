@@ -1,31 +1,40 @@
 #pragma once
-
 #include <string>
-#include <windows.h>
-#include <mmdeviceapi.h>
-#include <audioclient.h>
-#include <fstream>
 #include <thread>
 #include <atomic>
-#include "recorder.h"
-class WasapiRecorder : public Recorder {
+#include <windows.h>
+#include <audioclient.h>
+#include <mmdeviceapi.h>
 
+class WasapiRecorder {
 public:
     WasapiRecorder();
     ~WasapiRecorder();
 
-    // 开始录音，保存到filename（wav）
-    bool Start(const std::wstring& filename);
+    // --- 核心修复点：Start 函数现在接收音量百分比 ---
+    bool Start(const std::wstring& filename,
+        const std::wstring& inputDeviceId,
+        const std::wstring& outputDeviceId,
+        int micVolumePercent,
+        int speakerVolumePercent);
     void Stop();
     bool IsRecording() const;
 
 private:
-    std::atomic<bool> recording;
-    std::thread recordThread;
+    void MicRecordThreadProc();
+    void SpeakerRecordThreadProc();
+    void RecordLoop(bool isMic);
+    void RunFFmpegAndLog(const std::wstring& cmdLine);
 
-    std::wstring outputFilename;
+    std::atomic<bool> m_isRecording;
+    std::thread m_micThread;
+    std::thread m_speakerThread;
 
-    void RecordThreadProc();
-    void WriteWavHeader(std::ofstream& outFile, WAVEFORMATEX* pwfx, UINT32 dataLength);
-    void FixWavHeader(std::ofstream& outFile, UINT32 dataLength);
+    std::wstring m_finalMp3Path;
+    std::wstring m_micTempWavPath;
+    std::wstring m_speakerTempWavPath;
+    std::wstring m_inputDeviceId;
+    std::wstring m_outputDeviceId;
+    int m_micVolumePercent;
+    int m_speakerVolumePercent;
 };
