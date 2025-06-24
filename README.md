@@ -1,10 +1,8 @@
-**wecall-recorder** 是一款智能的 Windows 
+# wecall-recorder – 自动拾音工具
 
 ![C++](https://img.shields.io/badge/c++-17-blue.svg) ![Windows](https://img.shields.io/badge/platform-Windows-0078D6.svg) ![License](https://img.shields.io/badge/license-MIT-green.svg)
-桌面端录音工具，旨在自动检测并录制任何使用麦克风的应用程序（如网络会议、在线通话、语音聊天等）。它能静默运行在后台，一旦检测到麦克风被占用，便会自动开始录制，并在通话结束后自动停止，为您无缝保留每一段重要对话。
 
-作者：夜莺 
-版本：1.3.0 (2025-06-24) 
+**wecall-recorder** 是一款智能的 Windows 桌面端录音工具，旨在自动检测并录制任何使用麦克风的应用程序（如网络会议、在线通话、语音聊天等）。它能静默运行在后台，一旦检测到麦克风被占用，便会自动开始录制，并在通话结束后自动停止，为您无缝保留每一段重要对话。
 
 ## ✨ 主要功能
 
@@ -52,7 +50,7 @@
 ## 🚀 如何使用
 
 1.  下载最新版本的 `wecall-recorder.exe`。
-2.  按照**[环境要求](#️-重要环境要求)**配置好 `ffmpeg.exe`。
+2.  按照[环境要求](#️-重要环境要求)配置好 `ffmpeg.exe`。
 3.  直接运行 `wecall-recorder.exe`。
 4.  在主界面点击 **【设置】** 按钮，进行初次配置：
     - **【设备】** 页面：选择您常用的麦克风和扬声器设备。可以通过“测试”按钮检查工作是否正常。
