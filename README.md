@@ -1,4 +1,5 @@
 **wecall-recorder** 是一款智能的 Windows 
+
 ![C++](https://img.shields.io/badge/c++-17-blue.svg) ![Windows](https://img.shields.io/badge/platform-Windows-0078D6.svg) ![License](https://img.shields.io/badge/license-MIT-green.svg)
 桌面端录音工具，旨在自动检测并录制任何使用麦克风的应用程序（如网络会议、在线通话、语音聊天等）。它能静默运行在后台，一旦检测到麦克风被占用，便会自动开始录制，并在通话结束后自动停止，为您无缝保留每一段重要对话。
 
